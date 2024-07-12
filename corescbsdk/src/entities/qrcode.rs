@@ -1,3 +1,6 @@
+use std::fmt;
+use std::fmt::Formatter;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -20,8 +23,23 @@ pub struct QRCodeRequest {
     cs_user_defined: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub enum QRCodeType {
+    PP,
+    CS,
+    PPCS,
+}
+impl fmt::Display for QRCodeType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            QRCodeType::PP => write!(f, "PP"),
+            QRCodeType::CS => write!(f, "CS"),
+            QRCodeType::PPCS => write!(f, "PPCS"),
+        }
+    }
+}
 impl QRCodeRequest {
-    pub fn new(qr_type: &String, amount: &String) -> QRCodeRequest {
+    pub fn new(qr_type: &QRCodeType, amount: &String) -> QRCodeRequest {
         QRCodeRequest {
             qr_type: qr_type.to_string(),
             amount: amount.to_string(),

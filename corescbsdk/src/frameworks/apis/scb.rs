@@ -84,11 +84,13 @@ impl SCBClientAPI {
                 }
             }
         }
+        debug!("Request: {:#?}", qr_code_params);
         let request_uid = Uuid::new_v4();
-        let req = create_client()
+        let client = create_client();
+        let req = client
             .post(SANDBOX_QRCODE_CREATE_V1_URL)
             .header("Content-Type", "application/json")
-            .header("resourceOwnerId", self.application_name.to_string())
+            .header("resourceOwnerId", self.application_key.to_string())
             .header("requestUId", request_uid.to_string())
             .header("accept-language", "EN")
             .header(
@@ -98,17 +100,18 @@ impl SCBClientAPI {
                     self.access_token.as_ref().unwrap().access_token
                 ),
             )
-            .body(serde_json::to_string(qr_code_params).unwrap())
-            .send()
-            .await;
+            .json(qr_code_params)
+            .build()
+            .expect("Failed to build request");
+        debug!("Request : {:#?}", req);
+        let req = client.execute(req).await;
         match req {
             Ok(response) => {
-                let body = response
-                    .json::<SCBResponse<QRCodeResponse>>()
-                    .await;
+                debug!("Response: {:#?}", response);
+                let body = response.json::<SCBResponse<QRCodeResponse>>().await;
                 match body {
                     Ok(body) => {
-                        debug!("Response: {:?}", body);
+                        debug!("Response: {:#?}", body);
                         if body.status.code != 1000 {
                             return Err(SCBAPIError::SCBError(body.status.description));
                         }
