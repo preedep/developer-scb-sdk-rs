@@ -1,5 +1,6 @@
 use std::fmt;
 
+#[derive(Debug)]
 pub enum SCBAPIError {
     HttpRequestError(reqwest::Error),
     SCBError(String),

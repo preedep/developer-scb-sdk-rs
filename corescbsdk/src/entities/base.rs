@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug,Serialize,Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SCBAccessTokenRequest {
     #[serde(rename = "applicationKey")]
     pub(crate) application_key: String,
@@ -17,7 +17,7 @@ pub struct SCBAccessTokenRequest {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AccessToken {
     #[serde(rename = "accessToken")]
-    access_token: String,
+    pub(crate) access_token: String,
     #[serde(rename = "tokenType")]
     token_type: String,
     #[serde(rename = "expiresIn")]
@@ -31,7 +31,6 @@ pub struct AccessToken {
     #[serde(rename = "refreshExpiresAt")]
     refresh_expires_at: Option<i64>,
 }
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SCBResponse<T> {

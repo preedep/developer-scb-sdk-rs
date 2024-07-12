@@ -1,2 +1,2 @@
 pub(crate) mod base;
-pub(crate) mod qrcode;
+pub mod qrcode;

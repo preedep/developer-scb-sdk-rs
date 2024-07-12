@@ -1,1 +1,1 @@
-mod scb_api;
+pub mod scb;

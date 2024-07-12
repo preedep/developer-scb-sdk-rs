@@ -1,6 +1,6 @@
-mod entities;
-mod frameworks;
+pub mod entities;
 mod errors;
+pub mod frameworks;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
