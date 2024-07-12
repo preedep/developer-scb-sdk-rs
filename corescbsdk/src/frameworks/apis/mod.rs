@@ -1,1 +1,1 @@
-mod scbapi;
+mod scb_api;

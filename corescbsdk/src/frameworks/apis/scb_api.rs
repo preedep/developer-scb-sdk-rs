@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
-
+use uuid::Uuid;
 use crate::entities::qrcode::QRCodeRequest;
-use crate::entities::base::{AccessToken, SCBAccessTokenRequest};
+use crate::entities::base::{AccessToken, SCBAccessTokenRequest, SCBResponse};
+use crate::errors::scb_error::SCBAPIError;
 
 
 
@@ -27,7 +28,7 @@ impl SCBClientAPI {
             access_token: None,
         }
     }
-    async fn authentication(&mut self) -> Result<(), PEClientError> {
+    async fn authentication(&mut self) -> Result<(), SCBAPIError> {
         let request = SCBAccessTokenRequest {
             application_key: self.application_key.to_string(),
             application_secret: self.secret_key.to_string(),
@@ -49,13 +50,13 @@ impl SCBClientAPI {
             Ok(response) => {
                 let body = response.json::<SCBResponse<AccessToken>>().await.unwrap();
                 if body.status.code != 1000 {
-                    return Err(PEClientError::PartnerEcoError(body.status.description));
+                    return Err(SCBAPIError::SCBError(body.status.description));
                 }
                 self.access_token = Some(body.data);
                 Ok(())
             },
             Err(e) => {
-                Err(PEClientError::Reqwest(e))
+                Err(SCBAPIError::HttpRequestError(e))
             }
         }
     }

@@ -36,15 +36,15 @@ pub struct AccessToken {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SCBResponse<T> {
     #[serde(rename = "status")]
-    status: Status,
+    pub(crate) status: Status,
     #[serde(rename = "data")]
-    data: T,
+    pub(crate) data: T,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Status {
     #[serde(rename = "code")]
-    code: i32,
+    pub(crate) code: i32,
     #[serde(rename = "description")]
-    description: String,
+    pub(crate) description: String,
 }
