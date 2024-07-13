@@ -103,7 +103,15 @@ impl SCBClientAPI {
             .json(qr_code_params)
             .build()
             .expect("Failed to build request");
+
+
         debug!("Request : {:#?}", req);
+        if let Some(body) = req.body() {
+            let bytes = body.as_bytes().unwrap_or(&[]);
+            let body_str = String::from_utf8_lossy(bytes);
+            debug!("Request Body: {}", body_str);
+        }
+
         let req = client.execute(req).await;
         match req {
             Ok(response) => {

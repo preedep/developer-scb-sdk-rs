@@ -20,8 +20,7 @@ async fn main() {
         &"INVOICE".to_string(),
         &"684349039613126".to_string(),
         &"379479514042628".to_string(),
-    );
-    //.add_cs_ext_expiry_time(&"2021-12-31T23:59:59+07:00".to_string())
+    ).add_cs_ext_expiry_time(&"60".to_string());
     //.add_cs_note(&"This is a payment for the invoice".to_string())
     //.add_cs_user_defined(&"This is a user defined data".to_string());
 
