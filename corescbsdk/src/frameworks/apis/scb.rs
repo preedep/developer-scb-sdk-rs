@@ -1,4 +1,5 @@
 use log::{debug, error, info};
+use reqwest::header::{ACCEPT_LANGUAGE, CONTENT_TYPE, HeaderValue, USER_AGENT};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -22,7 +23,27 @@ pub struct SCBClientAPI {
 fn create_client() -> reqwest::Client {
     reqwest::Client::new()
 }
+fn generate_header(resource_owner_id: &String) -> reqwest::header::HeaderMap {
+    let mut headers = reqwest::header::HeaderMap::new();
+    let request_uid = Uuid::new_v4();
 
+
+    debug!("generate header");
+
+    headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+    headers.insert(ACCEPT_LANGUAGE, HeaderValue::from_static("EN"));
+    headers.insert(USER_AGENT, HeaderValue::from_static("SCB-OpenAPI-SDK/1.0"));
+    headers.insert(
+        "resourceOwnerId",
+        HeaderValue::from_str(resource_owner_id).unwrap(),
+    );
+    headers.insert(
+        "requestUId",
+        HeaderValue::from_str(&request_uid.to_string()).unwrap(),
+    );
+
+    headers
+}
 impl SCBClientAPI {
     pub fn new(
         application_name: &String,
@@ -45,25 +66,28 @@ impl SCBClientAPI {
             code_challenge: None,
         };
 
-        let request_uid = Uuid::new_v4();
         let req = create_client()
             .post(SANDBOX_OAUTH_TOKEN_V1_URL)
-            .header("Content-Type", "application/json")
-            .header("resourceOwnerId", self.application_name.to_string())
-            .header("requestUId", request_uid.to_string())
-            .header("accept-language", "EN")
+            .headers(generate_header(&self.application_name))
             .body(serde_json::to_string(&request).unwrap())
             .send()
             .await;
 
         match req {
             Ok(response) => {
-                let body = response.json::<SCBResponse<AccessToken>>().await.unwrap();
-                if body.status.code != 1000 {
-                    return Err(SCBAPIError::SCBError(body.status.description));
+                let body = response.json::<SCBResponse<AccessToken>>().await;
+                match body {
+                    Ok(body) => {
+                        if body.status.code != 1000 {
+                            return Err(SCBAPIError::SCBError(body.status.description));
+                        }
+                        self.access_token = Some(body.data.unwrap());
+                        Ok(())
+                    }
+                    Err(e) => {
+                        return Err(SCBAPIError::SCBError(e.to_string()));
+                    }
                 }
-                self.access_token = Some(body.data.unwrap());
-                Ok(())
             }
             Err(e) => Err(SCBAPIError::HttpRequestError(e)),
         }
@@ -85,14 +109,11 @@ impl SCBClientAPI {
             }
         }
         debug!("Request: {:#?}", qr_code_params);
-        let request_uid = Uuid::new_v4();
         let client = create_client();
         let req = client
             .post(SANDBOX_QRCODE_CREATE_V1_URL)
             .header("Content-Type", "application/json")
-            .header("resourceOwnerId", self.application_key.to_string())
-            .header("requestUId", request_uid.to_string())
-            .header("accept-language", "EN")
+            .headers(generate_header(&self.application_key))
             .header(
                 "authorization",
                 format!(
