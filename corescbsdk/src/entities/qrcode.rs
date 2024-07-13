@@ -130,50 +130,93 @@ impl QRCodeRequest {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct QRCodeResponse {
+    // QR Data
     #[serde(rename = "qrRawData")]
     pub qr_raw_data: Option<String>,
+    // Base64 Image of QR
     #[serde(rename = "qrImage")]
     pub qr_image: Option<String>,
+    // Conditional
+    // QR CS : Expiry time of the QR code
     #[serde(rename = "csExtExpiryTime")]
     pub cs_ext_expiry_time: Option<String>,
+    // Conditional
+    // QR CS : Status “000” is Success
     #[serde(rename = "responseCode")]
     pub response_code: Option<String>,
+    // Conditional
+    // QR CS : Type of QR code
     #[serde(rename = "qrCodeType")]
     pub qr_code_type: Option<String>,
+    // Conditional
+    // QR CS : Unique id of QR code
     #[serde(rename = "qrCodeId")]
     pub qr_code_id: Option<String>,
+    // Conditional
+    // QR CS : Point of initiation method
+    // - 11 = Static QR
+    // - 12 = Dynamic QR
     #[serde(rename = "poi")]
     pub poi: Option<String>,
+    // Conditional
+    // QR CS : Amount to be paid for the transaction
     #[serde(rename = "amount")]
     pub amount: Option<String>,
+    // Conditional
+    // QR CS : Currency code as defined by ISO4217
+    // - 764 (Baht)
     #[serde(rename = "currencyCode")]
     pub currency_code: Option<String>,
+    // Conditional
+    // QR CS : Name of currency
     #[serde(rename = "currencyName")]
     pub currency_name: Option<String>,
+    // Conditional
+    // QR CS : Description of QR transaction
     #[serde(rename = "csNote")]
     pub cs_note: Option<String>,
+    // Conditional
+    // QR CS : Invoice or bill number for the transaction
     #[serde(rename = "invoice")]
     pub invoice: Option<String>,
+    // Conditional
+    // QR CS : Merchant ID set by the company
     #[serde(rename = "merchantId")]
     pub merchant_id: Option<String>,
+    // Conditional
+    // QR CS : Merchant name
     #[serde(rename = "merchantName")]
     pub merchant_name: Option<String>,
+    // Conditional
+    // QR CS : Any value that was defined by user
     #[serde(rename = "csUserDefined")]
     pub cs_user_defined: Option<String>,
+    // Conditional
+    // QR CS : Terminal unique ID
     #[serde(rename = "terminalId")]
     pub terminal_id: Option<String>,
+    // Conditional
+    // QR CS : Name of terminal
     #[serde(rename = "terminalName")]
     pub terminal_name: Option<String>,
+    // Conditional
+    // QR CS : Array of supported for this QR code
     #[serde(rename = "channels")]
     pub channels: Option<Vec<Channel>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Channel {
+    // Conditional
+    // QR CS : Sequence number of this object in array
     #[serde(rename = "seqNo")]
     pub seq_no: Option<String>,
+    // Conditional
+    // QR CS : Channel code
     #[serde(rename = "channelName")]
     pub channel_name: Option<String>,
+    // Conditional
+    // QR CS : Channel name
     #[serde(rename = "channelCode")]
     pub channel_code: Option<String>,
 }
