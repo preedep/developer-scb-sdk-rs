@@ -111,7 +111,17 @@ impl QRCodeRequest {
         self.terminal_id = Some(terminal_id.to_string());
         self
     }
-    pub fn for_qr_tag30(&mut self) -> &mut Self {
+    pub fn for_qr_tag30(
+        &mut self,
+        pp_type: &String,
+        pp_id: &String,
+        ref1: &String,
+        ref3: &String,
+    ) -> &mut Self {
+        self.pp_type = Some(pp_type.to_string());
+        self.pp_id = Some(pp_id.to_string());
+        self.ref1 = Some(ref1.to_string());
+        self.ref3 = Some(ref3.to_string());
         self
     }
     pub fn add_cs_ext_expiry_time(&mut self, expiry_time: &String) -> &mut Self {
@@ -124,6 +134,10 @@ impl QRCodeRequest {
     }
     pub fn add_cs_user_defined(&mut self, user_defined: &String) -> &mut Self {
         self.cs_user_defined = Some(user_defined.to_string());
+        self
+    }
+    pub fn add_ref2(&mut self, ref2: &String) -> &mut Self {
+        self.ref2 = Some(ref2.to_string());
         self
     }
 }

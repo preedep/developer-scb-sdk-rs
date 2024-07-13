@@ -1,6 +1,6 @@
 use corescbsdk::entities::qrcode::{QRCodeRequest, QRCodeType};
 use corescbsdk::frameworks::apis::scb::SCBClientAPI;
-use log::debug;
+use log::{error, info};
 
 #[tokio::main]
 async fn main() {
@@ -14,21 +14,25 @@ async fn main() {
 
     let mut scb_client = SCBClientAPI::new(&application_name, &application_key, &secret_key);
 
-    let mut qr_code_request = QRCodeRequest::new(&QRCodeType::CS, &"100.00".to_string());
+    let mut qr_code_request = QRCodeRequest::new(&QRCodeType::PP, &"100.00".to_string());
 
     let qr_code_request = qr_code_request
-        .for_qr_cs(
-            &"INVOICE1234".to_string(),
-            &"684349039613126".to_string(),
-            &"379479514042628".to_string(),
+        .for_qr_tag30(
+            &"BILLERID".to_string(),
+            &"123456789012345".to_string(),
+            &"REFERENCE1".to_string(),
+            &"SCB".to_string(),
         )
-        .add_cs_ext_expiry_time(&"60".to_string());
-    //.add_cs_note(&"This is a payment for the invoice".to_string())
-    //.add_cs_user_defined(&"This is a user defined data".to_string());
+        .add_ref2(&"REFERENCE2".to_string());
 
-    let res = scb_client
-        .qr_code_create(&qr_code_request)
-        .await
-        .expect("Failed to create QR Code");
-    debug!("QRCode Response : {:#?}", res);
+    let res = scb_client.qr_code_create(&qr_code_request).await;
+
+    match res {
+        Ok(qr_code) => {
+            info!("QR Code: {:#?}", qr_code);
+        }
+        Err(e) => {
+            error!("Error: {:#?}", e);
+        }
+    }
 }
