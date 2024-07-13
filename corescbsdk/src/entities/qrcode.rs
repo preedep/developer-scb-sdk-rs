@@ -15,52 +15,52 @@ pub struct QRCodeRequest {
     #[serde(rename = "amount")]
     amount: String,
     // Invoice number as unique ID per transaction for QR CS. It must be English uppercase letters and numbers only.
-    #[serde(rename = "invoice",skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "invoice", skip_serializing_if = "Option::is_none")]
     invoice: Option<String>,
     // Merchant ID for QR CS.
-    #[serde(rename = "merchantId",skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "merchantId", skip_serializing_if = "Option::is_none")]
     merchant_id: Option<String>,
     // Terminal ID for QR CS.
-    #[serde(rename = "terminalId",skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "terminalId", skip_serializing_if = "Option::is_none")]
     terminal_id: Option<String>,
     // Value is in minute which indicates that the expiry time of the requested QR code will be in next X minutes
     // from the current time. If not specific the default expirytime will be 15 minutes.
-    #[serde(rename = "csExtExpiryTime",skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "csExtExpiryTime", skip_serializing_if = "Option::is_none")]
     cs_ext_expiry_time: Option<String>,
     // Description of QRCS Transaction
-    #[serde(rename = "csNote",skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "csNote", skip_serializing_if = "Option::is_none")]
     cs_note: Option<String>,
     // Any value which defined by user.
-    #[serde(rename = "csUserDefined",skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "csUserDefined", skip_serializing_if = "Option::is_none")]
     cs_user_defined: Option<String>,
     // PromptPay Type for QR 30
     // Value: BILLERID
-    #[serde(rename = "ppType",skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "ppType", skip_serializing_if = "Option::is_none")]
     pp_type: Option<String>,
     // Biller ID
     //
     // Note: Partners can get on merchant profile of their application.
     // Length: 15
-    #[serde(rename = "ppId",skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "ppId", skip_serializing_if = "Option::is_none")]
     pp_id: Option<String>,
     // Reference number required for the relevant payment methods.
     // Length: up to 20
     // Data Type: [AZ09] English capital letter and number only.
-    #[serde(rename = "ref1",skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "ref1", skip_serializing_if = "Option::is_none")]
     ref1: Option<String>,
     // Reference number required for the relevant payment methods.
     // Required if: Supporting Reference field under merchant profile of application is set to Two references.
     // Length: up to 20
     // Data Type: [AZ09] English capital letter and number only.
-    #[serde(rename = "ref2",skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "ref2", skip_serializing_if = "Option::is_none")]
     ref2: Option<String>,
     // Reference number required for the relevant payment methods to identify endpoint for receiving payment confirmation.
     // Format: Reference 3 Prefix + (value), example: SCB1234
-    // 
+    //
     // Note: Partners can get the Reference 3 Prefix and set the Payment Confirmation Endpoint on merchant profile of their application.
     // Length: up to 20
     // Data Type: [AZ09] English capital letter and number only.
-    #[serde(rename = "ref3",skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "ref3", skip_serializing_if = "Option::is_none")]
     ref3: Option<String>,
 }
 

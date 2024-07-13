@@ -37,7 +37,7 @@ pub struct SCBResponse<T> {
     #[serde(rename = "status")]
     pub(crate) status: Status,
     #[serde(rename = "data")]
-    pub(crate) data: T,
+    pub(crate) data: Option<T>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

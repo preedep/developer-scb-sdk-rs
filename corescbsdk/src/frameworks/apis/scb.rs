@@ -62,7 +62,7 @@ impl SCBClientAPI {
                 if body.status.code != 1000 {
                     return Err(SCBAPIError::SCBError(body.status.description));
                 }
-                self.access_token = Some(body.data);
+                self.access_token = Some(body.data.unwrap());
                 Ok(())
             }
             Err(e) => Err(SCBAPIError::HttpRequestError(e)),
@@ -104,7 +104,6 @@ impl SCBClientAPI {
             .build()
             .expect("Failed to build request");
 
-
         debug!("Request : {:#?}", req);
         if let Some(body) = req.body() {
             let bytes = body.as_bytes().unwrap_or(&[]);
@@ -123,12 +122,9 @@ impl SCBClientAPI {
                         if body.status.code != 1000 {
                             return Err(SCBAPIError::SCBError(body.status.description));
                         }
-                        Ok(body.data)
+                        Ok(body.data.unwrap())
                     }
-                    Err(e) => {
-                        error!("Error: {:?}", e);
-                        Err(SCBAPIError::SCBError(e.to_string()))
-                    }
+                    Err(e) => Err(SCBAPIError::SCBError(e.to_string())),
                 }
             }
             Err(e) => Err(SCBAPIError::HttpRequestError(e)),

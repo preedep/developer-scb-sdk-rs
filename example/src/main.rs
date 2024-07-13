@@ -16,11 +16,13 @@ async fn main() {
 
     let mut qr_code_request = QRCodeRequest::new(&QRCodeType::CS, &"100.00".to_string());
 
-    let qr_code_request = qr_code_request.for_qr_cs(
-        &"INVOICE".to_string(),
-        &"684349039613126".to_string(),
-        &"379479514042628".to_string(),
-    ).add_cs_ext_expiry_time(&"60".to_string());
+    let qr_code_request = qr_code_request
+        .for_qr_cs(
+            &"INVOICE1234".to_string(),
+            &"684349039613126".to_string(),
+            &"379479514042628".to_string(),
+        )
+        .add_cs_ext_expiry_time(&"60".to_string());
     //.add_cs_note(&"This is a payment for the invoice".to_string())
     //.add_cs_user_defined(&"This is a user defined data".to_string());
 
