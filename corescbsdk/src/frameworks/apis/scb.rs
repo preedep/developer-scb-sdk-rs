@@ -112,7 +112,6 @@ impl SCBClientAPI {
         let client = create_client();
         let req = client
             .post(SANDBOX_QRCODE_CREATE_V1_URL)
-            .header("Content-Type", "application/json")
             .headers(generate_header(&self.application_key))
             .header(
                 "authorization",
