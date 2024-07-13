@@ -19,17 +19,17 @@ pub struct AccessToken {
     #[serde(rename = "accessToken")]
     pub(crate) access_token: String,
     #[serde(rename = "tokenType")]
-    pub(crate)  token_type: String,
+    pub(crate) token_type: String,
     #[serde(rename = "expiresIn")]
-    pub(crate)  expires_in: i32,
+    pub(crate) expires_in: i32,
     #[serde(rename = "expiresAt")]
-    pub(crate)  expires_at: i64,
+    pub(crate) expires_at: i64,
     #[serde(rename = "refreshToken")]
-    pub(crate)  refresh_token: Option<String>,
+    pub(crate) refresh_token: Option<String>,
     #[serde(rename = "refreshExpiresIn")]
-    pub(crate)  refresh_expires_in: Option<i32>,
+    pub(crate) refresh_expires_in: Option<i32>,
     #[serde(rename = "refreshExpiresAt")]
-    pub(crate)  refresh_expires_at: Option<i64>,
+    pub(crate) refresh_expires_at: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

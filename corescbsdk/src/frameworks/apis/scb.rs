@@ -27,7 +27,6 @@ fn generate_header(resource_owner_id: &String) -> reqwest::header::HeaderMap {
     let mut headers = reqwest::header::HeaderMap::new();
     let request_uid = Uuid::new_v4();
 
-
     debug!("generate header");
 
     headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
@@ -57,7 +56,8 @@ impl SCBClientAPI {
             access_token: None,
         }
     }
-    async fn authentication(&mut self) -> Result<(), SCBAPIError> {
+
+    async fn request_access_token(&mut self) -> Result<(), SCBAPIError> {
         let request = SCBAccessTokenRequest {
             application_key: self.application_key.to_string(),
             application_secret: self.secret_key.to_string(),
@@ -71,7 +71,8 @@ impl SCBClientAPI {
             .headers(generate_header(&self.application_name))
             .body(serde_json::to_string(&request).unwrap())
             .send()
-            .await;
+            .await
+            .map_err(|e| SCBAPIError::HttpRequestError(e));
 
         match req {
             Ok(response) => {
@@ -89,15 +90,16 @@ impl SCBClientAPI {
                     }
                 }
             }
-            Err(e) => Err(SCBAPIError::HttpRequestError(e)),
+            Err(e) => Err(e),
         }
     }
+
     pub async fn qr_code_create(
         &mut self,
         qr_code_params: &QRCodeRequest,
     ) -> Result<QRCodeResponse, SCBAPIError> {
         if self.access_token.is_none() {
-            let req = self.authentication().await;
+            let req = self.request_access_token().await;
             match req {
                 Ok(_) => {
                     info!("Authentication success");

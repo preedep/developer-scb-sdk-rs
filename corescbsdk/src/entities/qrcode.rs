@@ -111,11 +111,12 @@ impl QRCodeRequest {
         self.terminal_id = Some(terminal_id.to_string());
         self
     }
-    pub fn for_qr_tag30(&mut self,
-                        pp_type:&String,
-                        pp_id: &String,
-                        ref1: &String,
-                        ref3: &String,
+    pub fn for_qr_tag30(
+        &mut self,
+        pp_type: &String,
+        pp_id: &String,
+        ref1: &String,
+        ref3: &String,
     ) -> &mut Self {
         self.pp_type = Some(pp_type.to_string());
         self.pp_id = Some(pp_id.to_string());
