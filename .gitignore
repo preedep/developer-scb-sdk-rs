@@ -1,0 +1,8 @@
+/target
+/.idea/vcs.xml
+/.idea/.gitignore
+/Cargo.lock
+/.idea/material_theme_project_new.xml
+/.idea/modules.xml
+/.idea/openapi-scb-sdk-rs.iml
+.env
