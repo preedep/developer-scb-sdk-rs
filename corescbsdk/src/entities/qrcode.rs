@@ -2,8 +2,11 @@ use std::fmt;
 use std::fmt::Formatter;
 
 use serde::{Deserialize, Serialize};
+use validator::Validate;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+use crate::entities::validate::{validate_amount, validate_data_type_az09};
+
+#[derive(Debug, Clone, Serialize, Deserialize, Validate)]
 pub struct QRCodeRequest {
     // Type of QR Code to request for generate QR code.
     // • “PP”: QR 30
@@ -13,6 +16,7 @@ pub struct QRCodeRequest {
     qr_type: String,
     // Amount of transaction with the length up to 13 characters including "." e.g. 100, 100.00
     #[serde(rename = "amount")]
+    #[validate(custom(function = "validate_amount"))]
     amount: String,
     // Invoice number as unique ID per transaction for QR CS. It must be English uppercase letters and numbers only.
     #[serde(rename = "invoice", skip_serializing_if = "Option::is_none")]
@@ -42,17 +46,20 @@ pub struct QRCodeRequest {
     // Note: Partners can get on merchant profile of their application.
     // Length: 15
     #[serde(rename = "ppId", skip_serializing_if = "Option::is_none")]
+    #[validate(length(max = 15))]
     pp_id: Option<String>,
     // Reference number required for the relevant payment methods.
     // Length: up to 20
     // Data Type: [AZ09] English capital letter and number only.
     #[serde(rename = "ref1", skip_serializing_if = "Option::is_none")]
+    #[validate(length(max = 20), custom(function = "validate_data_type_az09"))]
     ref1: Option<String>,
     // Reference number required for the relevant payment methods.
     // Required if: Supporting Reference field under merchant profile of application is set to Two references.
     // Length: up to 20
     // Data Type: [AZ09] English capital letter and number only.
     #[serde(rename = "ref2", skip_serializing_if = "Option::is_none")]
+    #[validate(length(max = 20),custom(function = "validate_data_type_az09"))]
     ref2: Option<String>,
     // Reference number required for the relevant payment methods to identify endpoint for receiving payment confirmation.
     // Format: Reference 3 Prefix + (value), example: SCB1234
@@ -61,6 +68,7 @@ pub struct QRCodeRequest {
     // Length: up to 20
     // Data Type: [AZ09] English capital letter and number only.
     #[serde(rename = "ref3", skip_serializing_if = "Option::is_none")]
+    #[validate(length(max = 20),custom(function = "validate_data_type_az09"))]
     ref3: Option<String>,
 }
 
@@ -88,7 +96,7 @@ pub struct QRCodeRequestBuilder {
 }
 
 impl QRCodeRequestBuilder {
-    pub fn new(qr_type: &QRCodeType, amount: &String) -> Self{
+    pub fn new(qr_type: &QRCodeType, amount: &String) -> Self {
         QRCodeRequestBuilder {
             qrcode_request: QRCodeRequest {
                 qr_type: qr_type.to_string(),
@@ -104,7 +112,7 @@ impl QRCodeRequestBuilder {
                 ref1: None,
                 ref2: None,
                 ref3: None,
-            }
+            },
         }
     }
     pub fn for_qr_cs(
@@ -152,7 +160,6 @@ impl QRCodeRequestBuilder {
         Ok(self.qrcode_request.clone())
     }
 }
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct QRCodeResponse {
