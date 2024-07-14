@@ -1,5 +1,5 @@
 use log::{debug, error, info};
-use reqwest::header::{ACCEPT_LANGUAGE, CONTENT_TYPE, HeaderValue, USER_AGENT};
+use reqwest::header::{ACCEPT_LANGUAGE, AUTHORIZATION, CONTENT_TYPE, HeaderValue, USER_AGENT};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -23,7 +23,8 @@ pub struct SCBClientAPI {
 fn create_client() -> reqwest::Client {
     reqwest::Client::new()
 }
-fn generate_header(resource_owner_id: &String) -> reqwest::header::HeaderMap {
+fn generate_header(resource_owner_id: &String,
+                   access_token: &Option<AccessToken>) -> reqwest::header::HeaderMap {
     let mut headers = reqwest::header::HeaderMap::new();
     let request_uid = Uuid::new_v4();
 
@@ -40,7 +41,13 @@ fn generate_header(resource_owner_id: &String) -> reqwest::header::HeaderMap {
         "requestUId",
         HeaderValue::from_str(&request_uid.to_string()).unwrap(),
     );
-
+    if let Some(token) = access_token {
+        let token =  format!(
+            "Bearer {}",
+            token.access_token
+        );
+        headers.insert(AUTHORIZATION,HeaderValue::from_str(&token).unwrap());
+    }
     headers
 }
 impl SCBClientAPI {
@@ -68,7 +75,7 @@ impl SCBClientAPI {
 
         let req = create_client()
             .post(SANDBOX_OAUTH_TOKEN_V1_URL)
-            .headers(generate_header(&self.application_name))
+            .headers(generate_header(&self.application_name,&None))
             .body(serde_json::to_string(&request).unwrap())
             .send()
             .await
@@ -98,30 +105,15 @@ impl SCBClientAPI {
         &mut self,
         qr_code_params: &QRCodeRequest,
     ) -> Result<QRCodeResponse, SCBAPIError> {
-        if self.access_token.is_none() {
-            let req = self.request_access_token().await;
-            match req {
-                Ok(_) => {
-                    info!("Authentication success");
-                }
-                Err(e) => {
-                    error!("Authentication failed: {:?}", e);
-                    return Err(e);
-                }
-            }
-        }
+
+        self.get_access_token_if_need().await?;
+
         debug!("Request: {:#?}", qr_code_params);
         let client = create_client();
         let req = client
             .post(SANDBOX_QRCODE_CREATE_V1_URL)
-            .headers(generate_header(&self.application_key))
-            .header(
-                "authorization",
-                format!(
-                    "Bearer {}",
-                    self.access_token.as_ref().unwrap().access_token
-                ),
-            )
+            .headers(generate_header(&self.application_key,
+                                     &self.access_token))
             .json(qr_code_params)
             .build()
             .expect("Failed to build request");
@@ -151,5 +143,39 @@ impl SCBClientAPI {
             }
             Err(e) => Err(SCBAPIError::HttpRequestError(e)),
         }
+    }
+
+    async fn get_access_token_if_need(&mut self) -> Result<(), SCBAPIError> {
+        if self.access_token.is_none() {
+            let req = self.request_access_token().await;
+            match req {
+                Ok(_) => {
+                    info!("Authentication success");
+                }
+                Err(e) => {
+                    error!("Authentication failed: {:?}", e);
+                    return Err(e);
+                }
+            }
+        } else {
+            let expired_at = self.access_token.as_ref().unwrap().expires_at;
+            let current_time = chrono::Utc::now().timestamp();
+            debug!("Current Time: {}", current_time);
+            debug!("Expired Time: {}", expired_at);
+
+            if current_time >= expired_at {
+                let req = self.request_access_token().await;
+                match req {
+                    Ok(_) => {
+                        info!("Authentication success");
+                    }
+                    Err(e) => {
+                        error!("Authentication failed: {:?}", e);
+                        return Err(e);
+                    }
+                }
+            }
+        }
+        Ok(())
     }
 }
