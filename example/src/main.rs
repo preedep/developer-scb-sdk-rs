@@ -14,11 +14,10 @@ async fn main() {
 
     let mut scb_client = SCBClientAPI::new(&application_name, &application_key, &secret_key);
 
+    let mut qr_code_req_builder = QRCodeRequestBuilder::new(&QRCodeType::PP, &"100.00".to_string());
 
-    let mut qr_code_req_builder = QRCodeRequestBuilder::new(&QRCodeType::PP,
-                                                            &"100.00".to_string());
-
-    let qr_code_req_builder = qr_code_req_builder.for_qr_tag30(
+    let qr_code_req_builder = qr_code_req_builder
+        .for_qr_tag30(
             &"BILLERID".to_string(),
             &"123456789012345".to_string(),
             &"REFERENCE1".to_string(),
