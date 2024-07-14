@@ -7,10 +7,10 @@ use crate::entities::base::{AccessToken, SCBAccessTokenRequest, SCBResponse};
 use crate::entities::qrcode::{QRCodeRequest, QRCodeResponse};
 use crate::errors::scb_error::SCBAPIError;
 
-const SANDBOX_OAUTH_TOKEN_V1_URL: &str =
-    "https://api-sandbox.partners.scb/partners/sandbox/v1/oauth/token";
-const SANDBOX_QRCODE_CREATE_V1_URL: &str =
-    "https://api-sandbox.partners.scb/partners/sandbox/v1/payment/qrcode/create";
+const OAUTH_TOKEN_V1_URL: &str = "/v1/oauth/token";
+const QRCODE_CREATE_V1_URL: &str = "/v1/payment/qrcode/create";
+
+const BASE_URL: &str = "https://api-sandbox.partners.scb/partners/sandbox";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SCBClientAPI {
@@ -22,6 +22,9 @@ pub struct SCBClientAPI {
 
 fn create_client() -> reqwest::Client {
     reqwest::Client::new()
+}
+fn api_url(path: &str) -> String {
+    format!("{}{}", BASE_URL, path)
 }
 fn generate_header(resource_owner_id: &String,
                    access_token: &Option<AccessToken>) -> reqwest::header::HeaderMap {
@@ -74,7 +77,7 @@ impl SCBClientAPI {
         };
 
         let req = create_client()
-            .post(SANDBOX_OAUTH_TOKEN_V1_URL)
+            .post(api_url(OAUTH_TOKEN_V1_URL))
             .headers(generate_header(&self.application_name,&None))
             .body(serde_json::to_string(&request).unwrap())
             .send()
@@ -111,7 +114,7 @@ impl SCBClientAPI {
         debug!("Request: {:#?}", qr_code_params);
         let client = create_client();
         let req = client
-            .post(SANDBOX_QRCODE_CREATE_V1_URL)
+            .post(api_url(QRCODE_CREATE_V1_URL))
             .headers(generate_header(&self.application_key,
                                      &self.access_token))
             .json(qr_code_params)
