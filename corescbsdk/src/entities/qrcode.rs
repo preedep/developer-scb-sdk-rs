@@ -88,7 +88,7 @@ pub struct QRCodeRequestBuilder {
 }
 
 impl QRCodeRequestBuilder {
-    pub fn new(qr_type: &QRCodeType, amount: &String) -> QRCodeRequestBuilder {
+    pub fn new(qr_type: &QRCodeType, amount: &String) -> Self{
         QRCodeRequestBuilder {
             qrcode_request: QRCodeRequest {
                 qr_type: qr_type.to_string(),
