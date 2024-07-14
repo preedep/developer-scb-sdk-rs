@@ -105,18 +105,9 @@ impl SCBClientAPI {
         &mut self,
         qr_code_params: &QRCodeRequest,
     ) -> Result<QRCodeResponse, SCBAPIError> {
-        if self.access_token.is_none() {
-            let req = self.request_access_token().await;
-            match req {
-                Ok(_) => {
-                    info!("Authentication success");
-                }
-                Err(e) => {
-                    error!("Authentication failed: {:?}", e);
-                    return Err(e);
-                }
-            }
-        }
+
+        self.get_access_token_if_need().await?;
+
         debug!("Request: {:#?}", qr_code_params);
         let client = create_client();
         let req = client
@@ -152,5 +143,39 @@ impl SCBClientAPI {
             }
             Err(e) => Err(SCBAPIError::HttpRequestError(e)),
         }
+    }
+
+    async fn get_access_token_if_need(&mut self) -> Result<(), SCBAPIError> {
+        if self.access_token.is_none() {
+            let req = self.request_access_token().await;
+            match req {
+                Ok(_) => {
+                    info!("Authentication success");
+                }
+                Err(e) => {
+                    error!("Authentication failed: {:?}", e);
+                    return Err(e);
+                }
+            }
+        } else {
+            let expired_at = self.access_token.as_ref().unwrap().expires_at;
+            let current_time = chrono::Utc::now().timestamp();
+            debug!("Current Time: {}", current_time);
+            debug!("Expired Time: {}", expired_at);
+
+            if current_time >= expired_at {
+                let req = self.request_access_token().await;
+                match req {
+                    Ok(_) => {
+                        info!("Authentication success");
+                    }
+                    Err(e) => {
+                        error!("Authentication failed: {:?}", e);
+                        return Err(e);
+                    }
+                }
+            }
+        }
+        Ok(())
     }
 }
