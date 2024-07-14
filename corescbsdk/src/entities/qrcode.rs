@@ -59,7 +59,7 @@ pub struct QRCodeRequest {
     // Length: up to 20
     // Data Type: [AZ09] English capital letter and number only.
     #[serde(rename = "ref2", skip_serializing_if = "Option::is_none")]
-    #[validate(length(max = 20),custom(function = "validate_data_type_az09"))]
+    #[validate(length(max = 20), custom(function = "validate_data_type_az09"))]
     ref2: Option<String>,
     // Reference number required for the relevant payment methods to identify endpoint for receiving payment confirmation.
     // Format: Reference 3 Prefix + (value), example: SCB1234
@@ -68,7 +68,7 @@ pub struct QRCodeRequest {
     // Length: up to 20
     // Data Type: [AZ09] English capital letter and number only.
     #[serde(rename = "ref3", skip_serializing_if = "Option::is_none")]
-    #[validate(length(max = 20),custom(function = "validate_data_type_az09"))]
+    #[validate(length(max = 20), custom(function = "validate_data_type_az09"))]
     ref3: Option<String>,
 }
 
