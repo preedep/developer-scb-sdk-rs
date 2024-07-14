@@ -34,12 +34,12 @@ async fn main() {
                     info!("QR Code: {:#?}", qr_code);
                 }
                 Err(e) => {
-                    error!("Error: {:#?}", e);
+                    error!("Error: {:?}", e);
                 }
             }
         }
         Err(e) => {
-            error!("Error: {:#?}", e);
+            error!("Error: {:?}", e);
         }
     }
 }
