@@ -3,7 +3,7 @@ use std::fmt::Formatter;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QRCodeRequest {
     // Type of QR Code to request for generate QR code.
     // • “PP”: QR 30
@@ -64,7 +64,7 @@ pub struct QRCodeRequest {
     ref3: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum QRCodeType {
     // QR 30
     PP,
@@ -82,22 +82,29 @@ impl fmt::Display for QRCodeType {
         }
     }
 }
-impl QRCodeRequest {
-    pub fn new(qr_type: &QRCodeType, amount: &String) -> QRCodeRequest {
-        QRCodeRequest {
-            qr_type: qr_type.to_string(),
-            amount: amount.to_string(),
-            invoice: None,
-            merchant_id: None,
-            terminal_id: None,
-            cs_ext_expiry_time: None,
-            cs_note: None,
-            cs_user_defined: None,
-            pp_type: None,
-            pp_id: None,
-            ref1: None,
-            ref2: None,
-            ref3: None,
+
+pub struct QRCodeRequestBuilder {
+    qrcode_request: QRCodeRequest,
+}
+
+impl QRCodeRequestBuilder {
+    pub fn new(qr_type: &QRCodeType, amount: &String) -> QRCodeRequestBuilder {
+        QRCodeRequestBuilder {
+            qrcode_request: QRCodeRequest {
+                qr_type: qr_type.to_string(),
+                amount: amount.to_string(),
+                invoice: None,
+                merchant_id: None,
+                terminal_id: None,
+                cs_ext_expiry_time: None,
+                cs_note: None,
+                cs_user_defined: None,
+                pp_type: None,
+                pp_id: None,
+                ref1: None,
+                ref2: None,
+                ref3: None,
+            }
         }
     }
     pub fn for_qr_cs(
@@ -106,9 +113,9 @@ impl QRCodeRequest {
         merchant_id: &String,
         terminal_id: &String,
     ) -> &mut Self {
-        self.invoice = Some(invoice.to_string());
-        self.merchant_id = Some(merchant_id.to_string());
-        self.terminal_id = Some(terminal_id.to_string());
+        self.qrcode_request.invoice = Some(invoice.to_string());
+        self.qrcode_request.merchant_id = Some(merchant_id.to_string());
+        self.qrcode_request.terminal_id = Some(terminal_id.to_string());
         self
     }
     pub fn for_qr_tag30(
@@ -118,29 +125,34 @@ impl QRCodeRequest {
         ref1: &String,
         ref3: &String,
     ) -> &mut Self {
-        self.pp_type = Some(pp_type.to_string());
-        self.pp_id = Some(pp_id.to_string());
-        self.ref1 = Some(ref1.to_string());
-        self.ref3 = Some(ref3.to_string());
+        self.qrcode_request.pp_type = Some(pp_type.to_string());
+        self.qrcode_request.pp_id = Some(pp_id.to_string());
+        self.qrcode_request.ref1 = Some(ref1.to_string());
+        self.qrcode_request.ref3 = Some(ref3.to_string());
         self
     }
     pub fn add_cs_ext_expiry_time(&mut self, expiry_time: &String) -> &mut Self {
-        self.cs_ext_expiry_time = Some(expiry_time.to_string());
+        self.qrcode_request.cs_ext_expiry_time = Some(expiry_time.to_string());
         self
     }
     pub fn add_cs_note(&mut self, note: &String) -> &mut Self {
-        self.cs_note = Some(note.to_string());
+        self.qrcode_request.cs_note = Some(note.to_string());
         self
     }
     pub fn add_cs_user_defined(&mut self, user_defined: &String) -> &mut Self {
-        self.cs_user_defined = Some(user_defined.to_string());
+        self.qrcode_request.cs_user_defined = Some(user_defined.to_string());
         self
     }
     pub fn add_ref2(&mut self, ref2: &String) -> &mut Self {
-        self.ref2 = Some(ref2.to_string());
+        self.qrcode_request.ref2 = Some(ref2.to_string());
         self
     }
+
+    pub fn build(&self) -> Result<QRCodeRequest, &'static str> {
+        Ok(self.qrcode_request.clone())
+    }
 }
+
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct QRCodeResponse {
