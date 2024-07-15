@@ -24,6 +24,7 @@ QR code generation of Thai QR Code standard Tag 30 (QR 30) and QR Card Scheme (Q
 
 for BILLER_ID , BILLER_NAME , REF_3PREFIX get it from Developer SCB Portal , under the your application details
 
+### Eample for generate QR Code Payment (QR 30) 
 ```chatinput
     let biller_id = std::env::var("BILLER_ID").unwrap();
     let biller_name = std::env::var("BILLER_NAME").unwrap();
