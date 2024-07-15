@@ -1,3 +1,3 @@
 mod api_utils;
-mod qr_code_payment;
+mod payments;
 pub mod scb;

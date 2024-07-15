@@ -1,5 +1,3 @@
-
-
 use log::debug;
 use reqwest::Client;
 

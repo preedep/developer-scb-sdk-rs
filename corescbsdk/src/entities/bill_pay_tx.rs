@@ -97,4 +97,3 @@ pub struct Account {
     #[serde(rename = "value")]
     pub value: String,
 }
-

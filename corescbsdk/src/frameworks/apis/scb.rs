@@ -2,10 +2,12 @@ use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
 
 use crate::entities::base::{AccessToken, SCBAccessTokenRequest, SCBResponse};
+use crate::entities::bill_pay_tx::BillPaymentTransaction;
 use crate::entities::qrcode::{QRCodeRequest, QRCodeResponse};
 use crate::errors::scb_error::SCBAPIError;
 use crate::frameworks::apis::api_utils::{api_url, generate_header, OAUTH_TOKEN_V1_URL};
-use crate::frameworks::apis::qr_code_payment::qr_code_create;
+use crate::frameworks::apis::payments::bill_payment;
+use crate::frameworks::apis::payments::qr_code::qr_code_create;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SCBClientAPI {
@@ -81,6 +83,25 @@ impl SCBClientAPI {
         let application_key = self.application_key.clone();
 
         qr_code_create(&application_key, &client, access_token, qr_code_params).await
+    }
+    pub async fn get_bill_payment_transaction(
+        &mut self,
+        trans_ref: &String,
+        sending_bank: &String,
+    ) -> Result<BillPaymentTransaction, SCBAPIError> {
+        self.get_access_token_if_need().await?;
+        let client = create_client();
+        let access_token = self.access_token.as_ref().unwrap();
+        let application_key = self.application_key.clone();
+
+        bill_payment::get_bill_payment_transaction(
+            &application_key,
+            &client,
+            access_token,
+            trans_ref,
+            sending_bank,
+        )
+        .await
     }
 
     async fn get_access_token_if_need(&mut self) -> Result<(), SCBAPIError> {
