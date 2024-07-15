@@ -22,28 +22,28 @@ pub struct BillPaymentInquiryRequest {
     // Biller ID from partner
     // Required if: eventCode = 00300100
     #[validate(length(max = 15))]
-    #[serde(rename = "billerId")]
+    #[serde(rename = "billerId",skip_serializing_if = "Option::is_none")]
     pub biller_id: Option<String>,
 
     // Reference Number 1 , up to 20 characters
     // Required if: eventCode = 00300100
     #[validate(length(max = 20))]
-    #[serde(rename = "reference1")]
+    #[serde(rename = "reference1",skip_serializing_if = "Option::is_none")]
     pub reference1: Option<String>,
 
     // Reference Number 2 , up to 20 characters
     #[validate(length(max = 20))]
-    #[serde(rename = "reference2")]
+    #[serde(rename = "reference2",skip_serializing_if = "Option::is_none")]
     pub reference2: Option<String>,
 
     // Transaction ID from a partner
     // Required if: eventCode = 00300104
     #[validate(length(max = 35))]
-    #[serde(rename = "partnerTransactionId")]
+    #[serde(rename = "partnerTransactionId",skip_serializing_if = "Option::is_none")]
     pub partner_transaction_id: Option<String>,
 
     // Transaction Amount
-    #[serde(rename = "amount")]
+    #[serde(rename = "amount",skip_serializing_if = "Option::is_none")]
     pub amount: Option<f64>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
