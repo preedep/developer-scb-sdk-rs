@@ -1,6 +1,6 @@
 mod example_slip_verification;
 
-use corescbsdk::entities::qrcode::{QRCodeRequestBuilder, QRCodeType};
+use corescbsdk::entities::qr_code::{QRCodeRequestBuilder, QRCodeType};
 use corescbsdk::frameworks::apis::scb::SCBClientAPI;
 use log::{debug, error, info};
 use std::thread::spawn;

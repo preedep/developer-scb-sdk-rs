@@ -2,7 +2,7 @@ use log::debug;
 use reqwest::Client;
 
 use crate::entities::base::{AccessToken};
-use crate::entities::qrcode::{QRCodeRequest, QRCodeResponse};
+use crate::entities::qr_code::{QRCodeRequest, QRCodeResponse};
 use crate::errors::scb_error::SCBAPIError;
 use crate::frameworks::apis::api_utils::{
     api_url, generate_header, map_result, QRCODE_CREATE_V1_URL,

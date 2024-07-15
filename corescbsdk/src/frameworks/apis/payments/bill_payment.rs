@@ -2,7 +2,7 @@ use log::debug;
 use reqwest::Client;
 
 use crate::entities::base::AccessToken;
-use crate::entities::bill_pay_tx::BillPaymentTransaction;
+use crate::entities::bill_pay::BillPaymentTransaction;
 use crate::errors::scb_error::SCBAPIError;
 use crate::frameworks::apis::api_utils::{
     api_url, generate_header, map_result, BILL_PAYMENT_TRANSACTION_V1_URL,

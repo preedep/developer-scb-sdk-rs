@@ -2,8 +2,8 @@ use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
 
 use crate::entities::base::{AccessToken, SCBAccessTokenRequest, SCBResponse};
-use crate::entities::bill_pay_tx::BillPaymentTransaction;
-use crate::entities::qrcode::{QRCodeRequest, QRCodeResponse};
+use crate::entities::bill_pay::BillPaymentTransaction;
+use crate::entities::qr_code::{QRCodeRequest, QRCodeResponse};
 use crate::errors::scb_error::SCBAPIError;
 use crate::frameworks::apis::api_utils::{api_url, generate_header, OAUTH_TOKEN_V1_URL};
 use crate::frameworks::apis::payments::bill_payment;
