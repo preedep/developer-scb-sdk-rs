@@ -14,7 +14,7 @@ pub struct SCBAccessTokenRequest {
     pub(crate) code_challenge: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AccessToken {
     #[serde(rename = "accessToken")]
     pub(crate) access_token: String,

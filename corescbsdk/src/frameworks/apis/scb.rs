@@ -1,16 +1,13 @@
 use log::{debug, error, info};
-use reqwest::header::{HeaderValue, ACCEPT_LANGUAGE, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::entities::base::{AccessToken, SCBAccessTokenRequest, SCBResponse};
+use crate::entities::bill_pay_tx::BillPaymentTransaction;
 use crate::entities::qrcode::{QRCodeRequest, QRCodeResponse};
 use crate::errors::scb_error::SCBAPIError;
-
-const OAUTH_TOKEN_V1_URL: &str = "/v1/oauth/token";
-const QRCODE_CREATE_V1_URL: &str = "/v1/payment/qrcode/create";
-
-const BASE_URL: &str = "https://api-sandbox.partners.scb/partners/sandbox";
+use crate::frameworks::apis::api_utils::{api_url, generate_header, OAUTH_TOKEN_V1_URL};
+use crate::frameworks::apis::payments::bill_payment;
+use crate::frameworks::apis::payments::qr_code::qr_code_create;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SCBClientAPI {
@@ -23,35 +20,7 @@ pub struct SCBClientAPI {
 fn create_client() -> reqwest::Client {
     reqwest::Client::new()
 }
-fn api_url(path: &str) -> String {
-    format!("{}{}", BASE_URL, path)
-}
-fn generate_header(
-    resource_owner_id: &String,
-    access_token: &Option<AccessToken>,
-) -> reqwest::header::HeaderMap {
-    let mut headers = reqwest::header::HeaderMap::new();
-    let request_uid = Uuid::new_v4();
 
-    debug!("generate header");
-
-    headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
-    headers.insert(ACCEPT_LANGUAGE, HeaderValue::from_static("EN"));
-    headers.insert(USER_AGENT, HeaderValue::from_static("SCB-OpenAPI-SDK/1.0"));
-    headers.insert(
-        "resourceOwnerId",
-        HeaderValue::from_str(resource_owner_id).unwrap(),
-    );
-    headers.insert(
-        "requestUId",
-        HeaderValue::from_str(&request_uid.to_string()).unwrap(),
-    );
-    if let Some(token) = access_token {
-        let token = format!("Bearer {}", token.access_token);
-        headers.insert(AUTHORIZATION, HeaderValue::from_str(&token).unwrap());
-    }
-    headers
-}
 impl SCBClientAPI {
     pub fn new(
         application_name: &String,
@@ -108,41 +77,31 @@ impl SCBClientAPI {
         qr_code_params: &QRCodeRequest,
     ) -> Result<QRCodeResponse, SCBAPIError> {
         self.get_access_token_if_need().await?;
-
         debug!("Request: {:#?}", qr_code_params);
         let client = create_client();
-        let req = client
-            .post(api_url(QRCODE_CREATE_V1_URL))
-            .headers(generate_header(&self.application_key, &self.access_token))
-            .json(qr_code_params)
-            .build()
-            .expect("Failed to build request");
+        let access_token = self.access_token.as_ref().unwrap();
+        let application_key = self.application_key.clone();
 
-        debug!("Request : {:#?}", req);
-        if let Some(body) = req.body() {
-            let bytes = body.as_bytes().unwrap_or(&[]);
-            let body_str = String::from_utf8_lossy(bytes);
-            debug!("Request Body: {}", body_str);
-        }
+        qr_code_create(&application_key, &client, access_token, qr_code_params).await
+    }
+    pub async fn get_bill_payment_transaction(
+        &mut self,
+        trans_ref: &String,
+        sending_bank: &String,
+    ) -> Result<BillPaymentTransaction, SCBAPIError> {
+        self.get_access_token_if_need().await?;
+        let client = create_client();
+        let access_token = self.access_token.as_ref().unwrap();
+        let application_key = self.application_key.clone();
 
-        let req = client.execute(req).await;
-        match req {
-            Ok(response) => {
-                debug!("Response: {:#?}", response);
-                let body = response.json::<SCBResponse<QRCodeResponse>>().await;
-                match body {
-                    Ok(body) => {
-                        debug!("Response: {:#?}", body);
-                        if body.status.code != 1000 {
-                            return Err(SCBAPIError::SCBError(body.status.description));
-                        }
-                        Ok(body.data.unwrap())
-                    }
-                    Err(e) => Err(SCBAPIError::SCBError(e.to_string())),
-                }
-            }
-            Err(e) => Err(SCBAPIError::HttpRequestError(e)),
-        }
+        bill_payment::get_bill_payment_transaction(
+            &application_key,
+            &client,
+            access_token,
+            trans_ref,
+            sending_bank,
+        )
+        .await
     }
 
     async fn get_access_token_if_need(&mut self) -> Result<(), SCBAPIError> {
