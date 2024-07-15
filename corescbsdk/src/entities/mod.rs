@@ -1,5 +1,5 @@
 pub(crate) mod base;
-pub mod qrcode;
+pub mod qr_code;
 
-pub mod bill_pay_tx;
+pub mod bill_pay;
 mod validate;

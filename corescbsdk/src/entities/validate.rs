@@ -26,6 +26,16 @@ pub fn validate_data_type_az09(data: &str) -> Result<(), ValidationError> {
     Ok(())
 }
 
+pub fn validate_data_type_date(data: &str) -> Result<(), ValidationError> {
+    let re = Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
+
+    if !re.is_match(data) {
+        return Err(ValidationError::new("invalid_format"));
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

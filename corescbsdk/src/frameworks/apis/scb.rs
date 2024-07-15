@@ -1,12 +1,12 @@
 use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
 
-use crate::entities::base::{AccessToken, SCBAccessTokenRequest, SCBResponse};
-use crate::entities::bill_pay_tx::BillPaymentTransaction;
-use crate::entities::qrcode::{QRCodeRequest, QRCodeResponse};
+use crate::entities::base::{AccessToken, SCBAccessTokenRequest};
+use crate::entities::bill_pay::{BillPaymentInquiryRequest, BillPaymentTransaction, BillPaymentTransactionSlip};
+use crate::entities::qr_code::{QRCodeRequest, QRCodeResponse};
 use crate::errors::scb_error::SCBAPIError;
-use crate::frameworks::apis::api_utils::{api_url, generate_header, OAUTH_TOKEN_V1_URL};
-use crate::frameworks::apis::payments::bill_payment;
+use crate::frameworks::apis::api_utils::{api_url, generate_header, map_result, OAUTH_TOKEN_V1_URL};
+use crate::frameworks::apis::payments::bill_pay;
 use crate::frameworks::apis::payments::qr_code::qr_code_create;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -52,21 +52,11 @@ impl SCBClientAPI {
             .await
             .map_err(|e| SCBAPIError::HttpRequestError(e));
 
-        match req {
-            Ok(response) => {
-                let body = response.json::<SCBResponse<AccessToken>>().await;
-                match body {
-                    Ok(body) => {
-                        if body.status.code != 1000 {
-                            return Err(SCBAPIError::SCBError(body.status.description));
-                        }
-                        self.access_token = Some(body.data.unwrap());
-                        Ok(())
-                    }
-                    Err(e) => {
-                        return Err(SCBAPIError::SCBError(e.to_string()));
-                    }
-                }
+        let res = map_result::<AccessToken>(req).await;
+        match res {
+            Ok(token) => {
+                self.access_token = Some(token);
+                Ok(())
             }
             Err(e) => Err(e),
         }
@@ -84,17 +74,18 @@ impl SCBClientAPI {
 
         qr_code_create(&application_key, &client, access_token, qr_code_params).await
     }
-    pub async fn get_bill_payment_transaction(
+
+    pub async fn get_slip_verification_qr30(
         &mut self,
         trans_ref: &String,
         sending_bank: &String,
-    ) -> Result<BillPaymentTransaction, SCBAPIError> {
+    ) -> Result<BillPaymentTransactionSlip, SCBAPIError> {
         self.get_access_token_if_need().await?;
         let client = create_client();
         let access_token = self.access_token.as_ref().unwrap();
         let application_key = self.application_key.clone();
 
-        bill_payment::get_bill_payment_transaction(
+        bill_pay::get_bill_payment_transaction(
             &application_key,
             &client,
             access_token,
@@ -102,6 +93,19 @@ impl SCBClientAPI {
             sending_bank,
         )
         .await
+    }
+
+    pub async fn query_bill_payment_transaction(
+        &mut self,
+        params: &BillPaymentInquiryRequest,
+    ) -> Result<Vec<BillPaymentTransaction>, SCBAPIError> {
+        self.get_access_token_if_need().await?;
+        let client = create_client();
+        let access_token = self.access_token.as_ref().unwrap();
+        let application_key = self.application_key.clone();
+
+        bill_pay::query_bill_payment_transaction(&application_key, &client, access_token, params)
+            .await
     }
 
     async fn get_access_token_if_need(&mut self) -> Result<(), SCBAPIError> {
