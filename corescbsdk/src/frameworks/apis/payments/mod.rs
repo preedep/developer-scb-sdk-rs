@@ -1,2 +1,2 @@
-pub(crate) mod bill_payment;
+pub(crate) mod bill_pay;
 pub mod qr_code;

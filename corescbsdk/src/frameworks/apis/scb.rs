@@ -6,7 +6,7 @@ use crate::entities::bill_pay::BillPaymentTransaction;
 use crate::entities::qr_code::{QRCodeRequest, QRCodeResponse};
 use crate::errors::scb_error::SCBAPIError;
 use crate::frameworks::apis::api_utils::{api_url, generate_header, OAUTH_TOKEN_V1_URL};
-use crate::frameworks::apis::payments::bill_payment;
+use crate::frameworks::apis::payments::bill_pay;
 use crate::frameworks::apis::payments::qr_code::qr_code_create;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -94,7 +94,7 @@ impl SCBClientAPI {
         let access_token = self.access_token.as_ref().unwrap();
         let application_key = self.application_key.clone();
 
-        bill_payment::get_bill_payment_transaction(
+        bill_pay::get_bill_payment_transaction(
             &application_key,
             &client,
             access_token,
