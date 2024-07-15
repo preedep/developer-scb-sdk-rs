@@ -1,5 +1,50 @@
 use serde::{Deserialize, Serialize};
+use validator::Validate;
 
+#[derive(Debug, Clone, Serialize, Deserialize,Validate)]
+pub struct BillPaymentInquiryRequest {
+    // Event code of payment type
+    // Possible value:
+    // 00300100 - Thai QR Code Tag 30 (C Scan B)
+    // 00300104 - My Prompt QR (B Scan C)
+    #[validate(length(min = 1, max = 10))]
+    #[serde(rename = "eventCode")]
+    pub event_code: String,
+
+    // Date of transaction.
+    // Format: yyyy-MM-dd
+    // Example: 2019-10-28
+    #[validate(length(min = 1, max = 10))]
+    #[serde(rename = "transactionDate")]
+    pub transaction_date: String,
+
+    // Biller ID from partner
+    // Required if: eventCode = 00300100
+    #[validate(length(max = 15))]
+    #[serde(rename = "billerId")]
+    pub biller_id: Option<String>,
+
+    // Reference Number 1 , up to 20 characters
+    // Required if: eventCode = 00300100
+    #[validate(length(max = 20))]
+    #[serde(rename = "reference1")]
+    pub reference1: Option<String>,
+
+    // Reference Number 2 , up to 20 characters
+    #[validate(length(max = 20))]
+    #[serde(rename = "reference2")]
+    pub reference2: Option<String>,
+
+    // Transaction ID from a partner
+    // Required if: eventCode = 00300104
+    #[validate(length(max = 35))]
+    #[serde(rename = "partnerTransactionId")]
+    pub partner_transaction_id: Option<String>,
+
+    // Transaction Amount
+    #[serde(rename = "amount")]
+    pub amount: Option<f64>,
+}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BillPaymentTransaction {
     // Transaction Slip ID
@@ -97,3 +142,4 @@ pub struct Account {
     #[serde(rename = "value")]
     pub value: String,
 }
+

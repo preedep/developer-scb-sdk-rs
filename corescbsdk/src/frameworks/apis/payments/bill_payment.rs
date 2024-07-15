@@ -1,3 +1,4 @@
+use log::debug;
 use reqwest::Client;
 
 use crate::entities::base::AccessToken;
@@ -25,6 +26,8 @@ pub async fn get_bill_payment_transaction(
         ))
         .build()
         .expect("Failed to build request");
+
+    debug!("Request : {:#?}", req);
 
     let req = client
         .execute(req)
