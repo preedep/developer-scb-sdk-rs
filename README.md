@@ -22,15 +22,33 @@ QR code generation of Thai QR Code standard Tag 30 (QR 30) and QR Card Scheme (Q
 - Generate QR CS Only
 - Generate QR 30 and QR CS together in a single QR Code
 
-```chatinput
-     let mut qr_code_req_builder = QRCodeRequestBuilder::new(&QRCodeType::PP,
-                                                            &"100.00".to_string());
+for BILLER_ID , BILLER_NAME , REF_3PREFIX get it from Developer SCB Portal , under the your application details
 
-    let qr_code_req_builder = qr_code_req_builder.for_qr_tag30(
+```chatinput
+    let biller_id = std::env::var("BILLER_ID").unwrap();
+    let biller_name = std::env::var("BILLER_NAME").unwrap();
+    let prefix_ref3 = std::env::var("REF_3PREFIX").unwrap();
+
+
+     
+    async fn generate_qr_code(application_name: &String,
+                          application_key: &String,
+                          secret_key: &String,
+                          biller_id: &String,
+                            biller_name: &String,
+                            prefix_ref3: &String,
+) {
+    let ref3 = format!("{}{}", prefix_ref3, "REFERENCE3");
+    debug!("Merchant name : {} , Ref3: {}",biller_name, ref3);
+    
+    let mut scb_client = SCBClientAPI::new(&application_name, &application_key, &secret_key);
+    let mut qr_code_req_builder = QRCodeRequestBuilder::new(&QRCodeType::PP, &"100.00".to_string());
+    let qr_code_req_builder = qr_code_req_builder
+        .for_qr_tag30(
             &"BILLERID".to_string(),
-            &"123456789012345".to_string(),
+            &biller_id,
             &"REFERENCE1".to_string(),
-            &"SCB".to_string(),
+            &ref3,
         )
         .add_ref2(&"REFERENCE2".to_string());
 
@@ -50,4 +68,5 @@ QR code generation of Thai QR Code standard Tag 30 (QR 30) and QR Card Scheme (Q
             error!("Error: {:?}", e);
         }
     }
+}
 ```
