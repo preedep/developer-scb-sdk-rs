@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+
 use crate::entities::validate::validate_data_type_date;
 
 #[derive(Debug, Clone, Serialize, Deserialize,Validate)]
@@ -46,8 +47,14 @@ pub struct BillPaymentInquiryRequest {
     #[serde(rename = "amount",skip_serializing_if = "Option::is_none")]
     pub amount: Option<f64>,
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct BillPaymentTransaction {
+pub struct  BillPaymentTransaction{
+
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BillPaymentTransactionSlip {
     // Transaction Slip ID
     #[serde(rename = "transRef")]
     pub trans_ref: String,
