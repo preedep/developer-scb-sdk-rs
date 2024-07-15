@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use crate::entities::validate::validate_data_type_date;
 
 #[derive(Debug, Clone, Serialize, Deserialize,Validate)]
 pub struct BillPaymentInquiryRequest {
@@ -14,7 +15,7 @@ pub struct BillPaymentInquiryRequest {
     // Date of transaction.
     // Format: yyyy-MM-dd
     // Example: 2019-10-28
-    #[validate(length(min = 1, max = 10))]
+    #[validate(length(min = 10, max = 10),custom(function = "validate_data_type_date"))]
     #[serde(rename = "transactionDate")]
     pub transaction_date: String,
 
