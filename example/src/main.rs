@@ -1,7 +1,7 @@
-use std::thread::spawn;
 use corescbsdk::entities::qrcode::{QRCodeRequestBuilder, QRCodeType};
 use corescbsdk::frameworks::apis::scb::SCBClientAPI;
 use log::{debug, error, info};
+use std::thread::spawn;
 
 #[tokio::main]
 async fn main() {
@@ -17,7 +17,6 @@ async fn main() {
     let biller_name = std::env::var("BILLER_NAME").unwrap();
     let prefix_ref3 = std::env::var("REF_3PREFIX").unwrap();
 
-
     let mut handles = vec![];
     for _ in 0..1 {
         let application_name = application_name.clone();
@@ -29,12 +28,15 @@ async fn main() {
         let prefix_ref3 = prefix_ref3.clone();
         let handle = spawn(move || {
             tokio::runtime::Runtime::new().unwrap().block_on(async {
-                generate_qr_code(&application_name,
-                                 &application_key,
-                                 &secret_key,
-                                 &biller_id,
-                &biller_name,
-                &prefix_ref3).await;
+                generate_qr_code(
+                    &application_name,
+                    &application_key,
+                    &secret_key,
+                    &biller_id,
+                    &biller_name,
+                    &prefix_ref3,
+                )
+                .await;
             });
         });
         handles.push(handle);
@@ -45,16 +47,17 @@ async fn main() {
     }
 }
 
-async fn generate_qr_code(application_name: &String,
-                          application_key: &String,
-                          secret_key: &String,
-                          biller_id: &String,
-                            biller_name: &String,
-                            prefix_ref3: &String,
+async fn generate_qr_code(
+    application_name: &String,
+    application_key: &String,
+    secret_key: &String,
+    biller_id: &String,
+    biller_name: &String,
+    prefix_ref3: &String,
 ) {
     let ref3 = format!("{}{}", prefix_ref3, "REFERENCE3");
-    debug!("Merchant name : {} , Ref3: {}",biller_name, ref3);
-    
+    debug!("Merchant name : {} , Ref3: {}", biller_name, ref3);
+
     let mut scb_client = SCBClientAPI::new(&application_name, &application_key, &secret_key);
     let mut qr_code_req_builder = QRCodeRequestBuilder::new(&QRCodeType::PP, &"100.00".to_string());
     let qr_code_req_builder = qr_code_req_builder
