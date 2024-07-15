@@ -84,7 +84,7 @@ impl SCBClientAPI {
 
         qr_code_create(&application_key, &client, access_token, qr_code_params).await
     }
-    pub async fn get_bill_payment_transaction(
+    pub async fn get_slip_verification_qr30(
         &mut self,
         trans_ref: &String,
         sending_bank: &String,
