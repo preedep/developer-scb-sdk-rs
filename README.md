@@ -1,5 +1,5 @@
-# SCB SDK for Rust
-SCB SDK (**Unofficial**) for Rust is a library that provides a simple way to interact with the SCB API (https://developer.scb/#/home). 
+# SCB SDK for Rust (**Unofficial**)
+SCB SDK for Rust is a library that provides a simple way to interact with the SCB API (https://developer.scb/#/home). 
 
 ## How to use SCB SDK for Rust
 
