@@ -5,7 +5,7 @@ use crate::entities::base::{AccessToken, SCBAccessTokenRequest, SCBResponse};
 use crate::entities::qrcode::{QRCodeRequest, QRCodeResponse};
 use crate::errors::scb_error::SCBAPIError;
 use crate::frameworks::apis::api_utils::{api_url, generate_header, OAUTH_TOKEN_V1_URL};
-use crate::frameworks::apis::qr_code_payment_api::qr_code_create;
+use crate::frameworks::apis::qr_code_payment::qr_code_create;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SCBClientAPI {
