@@ -1,11 +1,10 @@
-use crate::entities::base::{AccessToken, SCBResponse};
-use crate::entities::bill_pay_tx::BillPaymentTransaction;
-use log::debug;
 use reqwest::Client;
 
+use crate::entities::base::AccessToken;
+use crate::entities::bill_pay_tx::BillPaymentTransaction;
 use crate::errors::scb_error::SCBAPIError;
 use crate::frameworks::apis::api_utils::{
-    api_url, generate_header, BILL_PAYMENT_TRANSACTION_V1_URL,
+    api_url, generate_header, map_result, BILL_PAYMENT_TRANSACTION_V1_URL,
 };
 
 pub async fn get_bill_payment_transaction(
@@ -31,20 +30,5 @@ pub async fn get_bill_payment_transaction(
         .execute(req)
         .await
         .map_err(|e| SCBAPIError::HttpRequestError(e));
-    match req {
-        Ok(response) => {
-            let body = response.json::<SCBResponse<BillPaymentTransaction>>().await;
-            match body {
-                Ok(body) => {
-                    debug!("Response: {:#?}", body);
-                    if body.status.code != 1000 {
-                        return Err(SCBAPIError::SCBError(body.status.description));
-                    }
-                    Ok(body.data.unwrap())
-                }
-                Err(e) => Err(SCBAPIError::SCBError(e.to_string())),
-            }
-        }
-        Err(e) => Err(e),
-    }
+    map_result::<BillPaymentTransaction>(req).await
 }

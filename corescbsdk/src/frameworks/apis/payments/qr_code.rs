@@ -1,10 +1,12 @@
 use log::debug;
 use reqwest::Client;
 
-use crate::entities::base::{AccessToken, SCBResponse};
+use crate::entities::base::{AccessToken};
 use crate::entities::qrcode::{QRCodeRequest, QRCodeResponse};
 use crate::errors::scb_error::SCBAPIError;
-use crate::frameworks::apis::api_utils::{api_url, generate_header, QRCODE_CREATE_V1_URL};
+use crate::frameworks::apis::api_utils::{
+    api_url, generate_header, map_result, QRCODE_CREATE_V1_URL,
+};
 
 pub async fn qr_code_create(
     application_key: &String,
@@ -28,23 +30,9 @@ pub async fn qr_code_create(
         let body_str = String::from_utf8_lossy(bytes);
         debug!("Request Body: {}", body_str);
     }
-
-    let req = client.execute(req).await;
-    match req {
-        Ok(response) => {
-            debug!("Response: {:#?}", response);
-            let body = response.json::<SCBResponse<QRCodeResponse>>().await;
-            match body {
-                Ok(body) => {
-                    debug!("Response: {:#?}", body);
-                    if body.status.code != 1000 {
-                        return Err(SCBAPIError::SCBError(body.status.description));
-                    }
-                    Ok(body.data.unwrap())
-                }
-                Err(e) => Err(SCBAPIError::SCBError(e.to_string())),
-            }
-        }
-        Err(e) => Err(SCBAPIError::HttpRequestError(e)),
-    }
+    let req = client
+        .execute(req)
+        .await
+        .map_err(|e| SCBAPIError::HttpRequestError(e));
+    map_result::<QRCodeResponse>(req).await
 }
