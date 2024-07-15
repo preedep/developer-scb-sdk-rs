@@ -48,30 +48,53 @@ pub struct BillPaymentTransaction {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Sender {
+    // Display name for payer
+    #[serde(rename = "displayName")]
     pub display_name: String,
+    // Name of payer
+    #[serde(rename = "name")]
     pub name: String,
+    // See Proxy
+    #[serde(rename = "proxy")]
     pub proxy: Proxy,
+    // See Account
+    #[serde(rename = "account")]
+    pub account: Account,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Receiver {
+    // Display name for payee
+    #[serde(rename = "displayName")]
+    pub display_name: String,
+    // Name of payee
+    #[serde(rename = "name")]
+    pub name: String,
+    // See Proxy
+    #[serde(rename = "proxy")]
+    pub proxy: Proxy,
+    // See Account
+    #[serde(rename = "account")]
     pub account: Account,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Proxy {
+    // BILLERID
     #[serde(rename = "type")]
     pub type_field: String,
+    // BILLER ID
+    #[serde(rename = "value")]
     pub value: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Account {
+    // BANKAC
     #[serde(rename = "type")]
     pub type_field: String,
+    // Account Number
+    #[serde(rename = "value")]
     pub value: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Receiver {
-    pub display_name: String,
-    pub name: String,
-    pub proxy: Proxy,
-    pub account: Account,
-}
