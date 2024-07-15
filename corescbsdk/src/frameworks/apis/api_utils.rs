@@ -1,8 +1,11 @@
 use log::debug;
 use reqwest::header::{HeaderValue, ACCEPT_LANGUAGE, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
+use reqwest::Response;
+use serde::de::DeserializeOwned;
 use uuid::Uuid;
 
-use crate::entities::base::AccessToken;
+use crate::entities::base::{AccessToken, SCBResponse};
+use crate::errors::scb_error::SCBAPIError;
 
 pub const OAUTH_TOKEN_V1_URL: &str = "/v1/oauth/token";
 pub const QRCODE_CREATE_V1_URL: &str = "/v1/payment/qrcode/create";
@@ -38,4 +41,24 @@ pub fn generate_header(
         headers.insert(AUTHORIZATION, HeaderValue::from_str(&token).unwrap());
     }
     headers
+}
+pub async fn map_result<T: DeserializeOwned + std::fmt::Debug>(
+    response: Result<Response, SCBAPIError>,
+) -> Result<T, SCBAPIError> {
+    match response {
+        Ok(response) => {
+            let body = response.json::<SCBResponse<T>>().await;
+            match body {
+                Ok(body) => {
+                    debug!("Response: {:#?}", body);
+                    if body.status.code != 1000 {
+                        return Err(SCBAPIError::SCBError(body.status.description));
+                    }
+                    Ok(body.data.unwrap())
+                }
+                Err(e) => Err(SCBAPIError::SCBError(e.to_string())),
+            }
+        }
+        Err(e) => Err(e),
+    }
 }
