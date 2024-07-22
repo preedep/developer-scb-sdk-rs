@@ -1,12 +1,7 @@
-use std::ops::Deref;
-use std::path::{Path, PathBuf};
-use std::thread::spawn;
-
-use image::{ImageReader, Luma};
-use log::{debug, error, info};
+use image::{Luma};
+use log::{debug, error, };
 use qrcode::QrCode;
-use qrcode::render::unicode;
-use termimage::ops::{guess_format, load_image};
+
 
 use corescbsdk::entities::qr_code::{QRCodeRequestBuilder, QRCodeType};
 use corescbsdk::frameworks::apis::scb::SCBClientAPI;
@@ -96,21 +91,23 @@ async fn generate_qr_code(
                 Ok(qr_code) => {
                     //info!("QR Code: {:#?}", qr_code);
                     let code = QrCode::new(qr_code.qr_raw_data.unwrap()).unwrap();
-                    let image = code.render::<unicode::Dense1x2>().build();
+                    //let image = code.render::<unicode::Dense1x2>().build();
                     let image = code.render::<Luma<u8>>().build();
                     image.save("qrcode.png").unwrap();
-
+                    /*
                     let format = guess_format(&(String::new(), PathBuf::from("qrcode.png")));
                     match format {
                         Ok(f) => {
                             debug!("Format: {:?}", f);
                             let img = load_image(&(String::new(), PathBuf::from("qrcode.png")), f)
                                 .unwrap();
+
                         }
                         Err(e) => {
                             error!("Error: {:?}", e);
                         }
-                    }
+                    }*/
+
                 }
                 Err(e) => {
                     error!("Error: {:?}", e);
