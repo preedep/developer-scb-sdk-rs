@@ -6,3 +6,4 @@
 /.idea/modules.xml
 /.idea/openapi-scb-sdk-rs.iml
 .env
+/example/qrcode.png

@@ -1,9 +1,14 @@
 mod example_slip_verification;
 
+use std::path::Path;
 use corescbsdk::entities::qr_code::{QRCodeRequestBuilder, QRCodeType};
 use corescbsdk::frameworks::apis::scb::SCBClientAPI;
 use log::{debug, error, info};
 use std::thread::spawn;
+use image::{ImageFormat, Luma};
+use qrcode::QrCode;
+use qrcode::render::unicode;
+use termimage::ops::load_image;
 
 #[tokio::main]
 async fn main() {
@@ -19,6 +24,17 @@ async fn main() {
     let biller_name = std::env::var("BILLER_NAME").unwrap();
     let prefix_ref3 = std::env::var("REF_3PREFIX").unwrap();
 
+
+    generate_qr_code(
+        &application_name,
+        &application_key,
+        &secret_key,
+        &biller_id,
+        &biller_name,
+        &prefix_ref3,
+    )
+        .await;
+    /*
     let mut handles = vec![];
     for _ in 0..1 {
         let application_name = application_name.clone();
@@ -46,7 +62,8 @@ async fn main() {
 
     for handle in handles {
         handle.join().unwrap();
-    }
+    }*/
+
 }
 
 async fn generate_qr_code(
@@ -77,6 +94,16 @@ async fn generate_qr_code(
             match res {
                 Ok(qr_code) => {
                     info!("QR Code: {:#?}", qr_code);
+                    let code = QrCode::new(qr_code.qr_raw_data.unwrap()).unwrap();
+                    let image = code.render::<unicode::Dense1x2>().build();
+                    let image = code.render::<Luma<u8>>().build();
+                    image.save("qrcode.png").unwrap();
+
+                    let path = Path::new("qrcode.png");
+                    let img = load_image(path).unwrap();
+
+
+
                 }
                 Err(e) => {
                     error!("Error: {:?}", e);

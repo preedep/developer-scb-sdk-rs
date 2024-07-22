@@ -7,6 +7,7 @@ edition = "2021"
 [[bin]]
 name = "example_qr_cs"
 path = "src/example_qr_code.rs"
+required-features = ["qr_code"]
 
 [[bin]]
 name = "example_slip_verification"
@@ -19,3 +20,11 @@ tokio = {version = "1", features = ["full"]}
 pretty_env_logger = "0.5"
 log = "0.4"
 dotenv = "0.15"
+
+base64 = { version = "0.22" , optional = true }
+qrcode = { version = "0.14", optional = true }
+image = { version = "0.25" , optional = true }
+termimage = {version = "1.2" , optional = true }
+
+[features]
+qr_code = ["qrcode", "image", "base64", "termimage"]
