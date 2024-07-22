@@ -1,5 +1,5 @@
 use log::debug;
-use reqwest::header::{HeaderValue, ACCEPT_LANGUAGE, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
+use reqwest::header::{ACCEPT_LANGUAGE, AUTHORIZATION, CONTENT_TYPE, HeaderValue, USER_AGENT};
 use reqwest::Response;
 use serde::de::DeserializeOwned;
 use uuid::Uuid;
@@ -11,7 +11,6 @@ pub const OAUTH_TOKEN_V1_URL: &str = "/v1/oauth/token";
 pub const QRCODE_CREATE_V1_URL: &str = "/v1/payment/qrcode/create";
 pub const BILL_PAYMENT_TRANSACTION_V1_URL: &str = "/v1/payment/billpayment/transactions";
 pub const INQUIRY_BILL_PAYMENT_TRANSACTION_V1_URL: &str = "/v1/payment/billpayment/inquiry";
-
 
 const BASE_URL: &str = "https://api-sandbox.partners.scb/partners/sandbox";
 

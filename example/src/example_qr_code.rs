@@ -1,14 +1,17 @@
-mod example_slip_verification;
-
-use std::path::Path;
-use corescbsdk::entities::qr_code::{QRCodeRequestBuilder, QRCodeType};
-use corescbsdk::frameworks::apis::scb::SCBClientAPI;
-use log::{debug, error, info};
+use std::ops::Deref;
+use std::path::{Path, PathBuf};
 use std::thread::spawn;
-use image::{ImageFormat, Luma};
+
+use image::{ImageReader, Luma};
+use log::{debug, error, info};
 use qrcode::QrCode;
 use qrcode::render::unicode;
-use termimage::ops::load_image;
+use termimage::ops::{guess_format, load_image};
+
+use corescbsdk::entities::qr_code::{QRCodeRequestBuilder, QRCodeType};
+use corescbsdk::frameworks::apis::scb::SCBClientAPI;
+
+mod example_slip_verification;
 
 #[tokio::main]
 async fn main() {
@@ -24,7 +27,6 @@ async fn main() {
     let biller_name = std::env::var("BILLER_NAME").unwrap();
     let prefix_ref3 = std::env::var("REF_3PREFIX").unwrap();
 
-
     generate_qr_code(
         &application_name,
         &application_key,
@@ -33,7 +35,7 @@ async fn main() {
         &biller_name,
         &prefix_ref3,
     )
-        .await;
+    .await;
     /*
     let mut handles = vec![];
     for _ in 0..1 {
@@ -63,7 +65,6 @@ async fn main() {
     for handle in handles {
         handle.join().unwrap();
     }*/
-
 }
 
 async fn generate_qr_code(
@@ -93,17 +94,23 @@ async fn generate_qr_code(
             let res = scb_client.qr_code_create(&qr_code_request).await;
             match res {
                 Ok(qr_code) => {
-                    info!("QR Code: {:#?}", qr_code);
+                    //info!("QR Code: {:#?}", qr_code);
                     let code = QrCode::new(qr_code.qr_raw_data.unwrap()).unwrap();
                     let image = code.render::<unicode::Dense1x2>().build();
                     let image = code.render::<Luma<u8>>().build();
                     image.save("qrcode.png").unwrap();
 
-                    let path = Path::new("qrcode.png");
-                    let img = load_image(path).unwrap();
-
-
-
+                    let format = guess_format(&(String::new(), PathBuf::from("qrcode.png")));
+                    match format {
+                        Ok(f) => {
+                            debug!("Format: {:?}", f);
+                            let img = load_image(&(String::new(), PathBuf::from("qrcode.png")), f)
+                                .unwrap();
+                        }
+                        Err(e) => {
+                            error!("Error: {:?}", e);
+                        }
+                    }
                 }
                 Err(e) => {
                     error!("Error: {:?}", e);
