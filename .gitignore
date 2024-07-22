@@ -7,3 +7,4 @@
 /.idea/openapi-scb-sdk-rs.iml
 .env
 /example/qrcode.png
+/.fleet/run.json

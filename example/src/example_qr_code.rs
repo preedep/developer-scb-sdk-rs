@@ -1,4 +1,4 @@
-use image::{Luma};
+use image::Luma;
 use log::{debug, error, };
 use qrcode::QrCode;
 
