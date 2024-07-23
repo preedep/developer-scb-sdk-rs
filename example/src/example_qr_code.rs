@@ -1,7 +1,6 @@
-use image::{Luma};
-use log::{debug, error, };
+use image::Luma;
+use log::{debug, error};
 use qrcode::QrCode;
-
 
 use corescbsdk::entities::qr_code::{QRCodeRequestBuilder, QRCodeType};
 use corescbsdk::frameworks::apis::scb::SCBClientAPI;
@@ -31,35 +30,6 @@ async fn main() {
         &prefix_ref3,
     )
     .await;
-    /*
-    let mut handles = vec![];
-    for _ in 0..1 {
-        let application_name = application_name.clone();
-        let application_key = application_key.clone();
-        let secret_key = secret_key.clone();
-
-        let biller_id = biller_id.clone();
-        let biller_name = biller_name.clone();
-        let prefix_ref3 = prefix_ref3.clone();
-        let handle = spawn(move || {
-            tokio::runtime::Runtime::new().unwrap().block_on(async {
-                generate_qr_code(
-                    &application_name,
-                    &application_key,
-                    &secret_key,
-                    &biller_id,
-                    &biller_name,
-                    &prefix_ref3,
-                )
-                .await;
-            });
-        });
-        handles.push(handle);
-    }
-
-    for handle in handles {
-        handle.join().unwrap();
-    }*/
 }
 
 async fn generate_qr_code(
@@ -94,20 +64,6 @@ async fn generate_qr_code(
                     //let image = code.render::<unicode::Dense1x2>().build();
                     let image = code.render::<Luma<u8>>().build();
                     image.save("qrcode.png").unwrap();
-                    /*
-                    let format = guess_format(&(String::new(), PathBuf::from("qrcode.png")));
-                    match format {
-                        Ok(f) => {
-                            debug!("Format: {:?}", f);
-                            let img = load_image(&(String::new(), PathBuf::from("qrcode.png")), f)
-                                .unwrap();
-
-                        }
-                        Err(e) => {
-                            error!("Error: {:?}", e);
-                        }
-                    }*/
-
                 }
                 Err(e) => {
                     error!("Error: {:?}", e);
