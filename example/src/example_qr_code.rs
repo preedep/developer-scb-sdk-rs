@@ -1,5 +1,5 @@
 use image::Luma;
-use log::{debug, error};
+use log::{debug, error, info};
 use qrcode::QrCode;
 
 use corescbsdk::entities::qr_code::{QRCodeRequestBuilder, QRCodeType};
@@ -59,11 +59,10 @@ async fn generate_qr_code(
             let res = scb_client.qr_code_create(&qr_code_request).await;
             match res {
                 Ok(qr_code) => {
-                    //info!("QR Code: {:#?}", qr_code);
                     let code = QrCode::new(qr_code.qr_raw_data.unwrap()).unwrap();
-                    //let image = code.render::<unicode::Dense1x2>().build();
                     let image = code.render::<Luma<u8>>().build();
                     image.save("qrcode.png").unwrap();
+                    info!("QR Code generated successfully");
                 }
                 Err(e) => {
                     error!("Error: {:?}", e);
