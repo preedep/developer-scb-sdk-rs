@@ -1,5 +1,5 @@
 use log::debug;
-use reqwest::header::{ACCEPT_LANGUAGE, AUTHORIZATION, CONTENT_TYPE, HeaderValue, USER_AGENT};
+use reqwest::header::{HeaderValue, ACCEPT_LANGUAGE, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
 use reqwest::Response;
 use serde::de::DeserializeOwned;
 use uuid::Uuid;
