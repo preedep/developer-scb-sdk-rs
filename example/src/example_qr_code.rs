@@ -1,3 +1,4 @@
+use std::process::Command;
 use image::Luma;
 use log::{debug, error, info};
 use qrcode::QrCode;
@@ -59,10 +60,41 @@ async fn generate_qr_code(
             let res = scb_client.qr_code_create(&qr_code_request).await;
             match res {
                 Ok(qr_code) => {
+                    let image_path = "qrcode.png";
                     let code = QrCode::new(qr_code.qr_raw_data.unwrap()).unwrap();
                     let image = code.render::<Luma<u8>>().build();
-                    image.save("qrcode.png").unwrap();
+                    image.save(image_path).unwrap();
                     info!("QR Code generated successfully");
+                    
+                    // Determine the command based on the platform
+                    let command = if cfg!(target_os = "macos") {
+                        format!("open {}", image_path)
+                    } else if cfg!(target_os = "linux") {
+                        format!("xdg-open {}", image_path)
+                    } else if cfg!(target_os = "windows") {
+                        format!("start {}", image_path)
+                    } else {
+                        error!("Unsupported platform.");
+                        return;
+                    };
+                    
+                    
+                    // Execute the command
+                    let output = Command::new("sh")
+                        .arg("-c")
+                        .arg(&command)
+                        .output()
+                        .expect("Failed to execute command");
+
+                    // Check if the command was successful
+                    if output.status.success() {
+                        info!("Successfully opened the image.");
+                    } else {
+                        eprintln!("Failed to open the image.");
+                        if let Ok(stderr) = String::from_utf8(output.stderr) {
+                            error!("Error: {}", stderr);
+                        }
+                    }
                 }
                 Err(e) => {
                     error!("Error: {:?}", e);
